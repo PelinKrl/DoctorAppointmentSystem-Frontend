@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Registration - FindYourDoctor</title>
+    <link rel="stylesheet" href="../Styles/style.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://apis.google.com/js/api:client.js"></script>
+</head>
+<body>
+    <!-- App Bar -->
+    <nav class="app-bar">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>FindYourDoctor</span>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='index.html'" class="nav-btn login-nav">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>DOCTOR : REGISTERS</h1>
+        </header>
+        
+        <main class="registration-form">
+            <h2>ADD ME AS DOCTOR</h2>
+            <form id="doctorRegistrationForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" placeholder="doctor@gmail.com" required>
+                    <button type="button" class="google-auth">
+                        <i class="fab fa-google"></i>
+                        Authenticate with Google
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="fullname">Fullname:</label>
+                    <input type="text" id="fullname" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialization">Area of Interest:</label>
+                    <select id="specialization" required>
+                        <option value="">Select Specialization</option>
+                        <option value="orthopedics">Orthopedics</option>
+                        <option value="pediatrics">Pediatrics</option>
+                        <option value="gynecology">Obstetrics And Gynecology</option>
+                        <option value="psychology">Psychology</option>
+                        <option value="ent">Ear Nose Throat</option>
+                        <option value="surgery">General Surgery</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Available Days:</label>
+                    <div class="days-selection">
+                        <label><input type="checkbox" name="days" value="mon"> Mon</label>
+                        <label><input type="checkbox" name="days" value="tue"> Tue</label>
+                        <label><input type="checkbox" name="days" value="wed"> Wed</label>
+                        <label><input type="checkbox" name="days" value="thu"> Thu</label>
+                        <label><input type="checkbox" name="days" value="fri"> Fri</label>
+                        <label><input type="checkbox" name="days" value="sat"> Sat</label>
+                        <label><input type="checkbox" name="days" value="sun"> Sun</label>
+                    </div>
+                </div>
+
+                <div class="form-group time-range">
+                    <label>Available Hours:</label>
+                    <input type="time" id="startTime" value="10:00" required>
+                    <span>-</span>
+                    <input type="time" id="endTime" value="20:00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <textarea id="address" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <select id="city" required>
+                        <option value="">Select City</option>
+                        <option value="istanbul">Istanbul</option>
+                        <option value="ankara">Ankara</option>
+                        <option value="izmir">Izmir</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="town">Town:</label>
+                    <select id="town" required>
+                        <option value="">Select Town</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="register-btn">REGISTER</button>
+            </form>
+
+            <div class="note">
+                <p>Doctors will give extra information after google authentication</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="../Scripts/app.js"></script>
+</body>
+</html>

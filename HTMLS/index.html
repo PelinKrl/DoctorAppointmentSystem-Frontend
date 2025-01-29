@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindYourDoctor - Doctor Appointment System</title>
+    <link rel="stylesheet" href="../Styles/style.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .admin-login-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 24px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .admin-login-btn:hover {
+            background-color: #444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .admin-login-btn i {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <!-- App Bar -->
+        <nav class="app-bar">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>FindYourDoctor</span>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="window.location.href='doctor_register.html'" class="nav-btn doctor-nav">
+                    <i class="fas fa-user-md"></i>
+                    Are you a doctor?
+                </button>
+                <button onclick="window.location.href='user_register.html'" class="nav-btn login-nav">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Log in
+                </button>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <main class="hero-section">
+            <h1>Find Your Doctor</h1>
+            <p class="subtitle">Welcome to your number one doctor appointment system</p>
+            <p class="description">
+                Connect with trusted healthcare professionals, book appointments instantly, 
+                and take control of your health journey with our seamless platform.
+            </p>
+            
+            <div class="cta-buttons">
+                <button onclick="window.location.href='doctor_register.html'" class="cta-btn doctor-cta">
+                    <i class="fas fa-user-md"></i>
+                    Join as Doctor
+                </button>
+                <button onclick="checkAuthAndRedirect()" class="cta-btn patient-cta">
+                    <i class="fas fa-user"></i>
+                    Book Appointment
+                </button>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <i class="fas fa-search"></i>
+                    <h3>Find Specialists</h3>
+                    <p>Search and find the right specialist for your needs</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>Easy Booking</h3>
+                    <p>Book appointments with just a few clicks</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-star"></i>
+                    <h3>Verified Doctors</h3>
+                    <p>All our doctors are verified professionals</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Admin Login Button -->
+        <button onclick="window.location.href='admin-login.html'" class="admin-login-btn">
+            <i class="fas fa-user-shield"></i>
+            Admin Login
+        </button>
+    </div>
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../Scripts/firebase-config.js"></script>
+    <script src="../Scripts/app.js"></script>
+</body>
+</html>

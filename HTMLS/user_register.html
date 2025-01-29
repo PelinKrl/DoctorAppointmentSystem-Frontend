@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration - FindYourDoctor</title>
+    <link rel="stylesheet" href="../Styles/style.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- App Bar -->
+    <nav class="app-bar">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>FindYourDoctor</span>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='index.html'" class="nav-btn login-nav">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </button>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <h2>Welcome to FindYourDoctor</h2>
+        <p class="login-subtitle">Sign in to manage your appointments</p>
+        
+        <div class="auth-buttons">
+            <button id="google-sign-in" class="google-auth-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+        </div>
+
+        <div id="user-info" class="user-info" style="display: none;">
+            <img id="user-photo" class="user-photo" alt="Profile Photo">
+            <p id="user-name" class="user-name"></p>
+            <p id="user-email" class="user-email"></p>
+            <button id="sign-out" class="sign-out-btn">Sign Out</button>
+        </div>
+
+        <div class="privacy-notice">
+            <p>By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+        </div>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <script src="../Scripts/firebase-config.js"></script>
+    <script type="module" src="../Scripts/auth.js"></script>
+
+    <script>
+        // Use the firebaseConfig from firebase-config.js
+        const firebaseConfig = window.firebaseConfig;
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Get elements
+        const googleSignInBtn = document.getElementById('google-sign-in');
+        const userInfoDiv = document.getElementById('user-info');
+        const userPhoto = document.getElementById('user-photo');
+        const userName = document.getElementById('user-name');
+        const userEmail = document.getElementById('user-email');
+        const signOutBtn = document.getElementById('sign-out');
+
+        // Handle Google Sign-in
+        googleSignInBtn.addEventListener('click', function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            firebase.auth().signInWithPopup(provider)
+                .then(async (result) => {
+                    const user = result.user;
+                    console.log('Successfully signed in:', user);
+                    
+                    // Get Firebase token
+                    const token = await user.getIdToken();
+                    
+                    // Store user info and token in localStorage
+                    localStorage.setItem('user', JSON.stringify({
+                        displayName: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        uid: user.uid
+                    }));
+                    localStorage.setItem('patientToken', token);
+
+                    // Try to register patient in backend
+                    try {
+                        const response = await fetch('https://localhost:7285/api/patients/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                fullName: user.displayName,
+                                email: user.email,
+                                firebaseUserId: user.uid
+                            })
+                        });
+
+                        if (response.ok) {
+                            console.log('Patient registered successfully');
+                            window.location.href = 'appointment_page.html';
+                        } else {
+                            const errorData = await response.json();
+                            console.log('Backend response:', errorData);
+                            
+                            // If patient is already registered, just redirect to appointment page
+                            if (errorData.error === "Patient is already registered.") {
+                                console.log('Patient already registered, redirecting to appointments');
+                                window.location.href = 'appointment_page.html';
+                            } else {
+                                console.error('Patient registration failed:', errorData);
+                                alert('Registration failed. Please try again.');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error registering patient:', error);
+                        alert('Connection failed. Please check if the backend server is running.');
+                    } 
+                })
+                .catch((error) => {
+                    console.error('Error signing in:', error);
+                    if (error.code === 'auth/operation-not-supported-in-this-environment') {
+                        alert('Please access this page through a web server (http://localhost:808) instead of opening the file directly.');
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        alert('This domain is not authorized for Firebase authentication. Please add "localhost" to your Firebase Console under Authentication > Sign-in methods > Authorized domains.');
+                    } else {
+                        alert('Error signing in. Please try again. ' + error.message);
+                    }
+                });
+        });
+
+        // Sign out
+        signOutBtn.addEventListener('click', function() {
+            firebase.auth().signOut()
+                .then(() => {
+                    console.log('Signed out successfully');
+                    updateUIForSignedOutUser();
+                })
+                .catch((error) => {
+                    console.error('Error signing out:', error);
+                });
+        });
+
+        // Update UI for signed-in user
+        function updateUIForSignedInUser(user) {
+            googleSignInBtn.style.display = 'none';
+            userInfoDiv.style.display = 'block';
+            userPhoto.src = user.photoURL || 'default-profile.png';
+            userName.textContent = user.displayName;
+            userEmail.textContent = user.email;
+        }
+
+        // Update UI for signed-out user
+        function updateUIForSignedOutUser() {
+            googleSignInBtn.style.display = 'block';
+            userInfoDiv.style.display = 'none';
+            userPhoto.src = '';
+            userName.textContent = '';
+            userEmail.textContent = '';
+            localStorage.removeItem('user');
+        }
+
+        // Check if user is already signed in
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log('User is signed in:', user);
+                updateUIForSignedInUser(user);
+            } else {
+                console.log('User is signed out');
+                updateUIForSignedOutUser();
+            }
+        });
+    </script>
+</body>
+</html>

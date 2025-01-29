@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Doctor - Appointments</title>
+    <link rel="stylesheet" href="../Styles/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #64B5F6;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 400px;
+            gap: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #757575;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .search-input::placeholder {
+            color: #757575;
+            opacity: 0.8;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+            outline: none;
+        }
+
+        .search-btn {
+            padding: 16px 32px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-btn i {
+            font-size: 18px;
+        }
+
+        .search-btn:hover {
+            background-color: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: white;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .doctor-info {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+
+        .doctor-image {
+            width: 140px;
+            height: 140px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        .doctor-details {
+            flex: 1;
+        }
+
+        .doctor-details h3 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+            color: var(--text-color);
+        }
+
+        .specialty {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .rating {
+            color: #FFC107;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .rating i {
+            margin-right: 2px;
+        }
+
+        .rating span {
+            color: #666;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        .location {
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .availability {
+            display: none;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .doctor-card.expanded .availability {
+            display: block;
+        }
+
+        .date-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 8px 4px;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .date-selector::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .date-selector::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .date-btn {
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .date-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-btn:hover:not(.active) {
+            background-color: var(--light-gray);
+            transform: translateY(-1px);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            padding: 4px;
+            margin-top: 20px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            background-color: #fff;
+        }
+
+        .time-slot:hover:not(.unavailable) {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-slot.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .time-slot.unavailable {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .no-slots, .error-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #dc3545;
+        }
+
+        .map-section {
+            position: sticky;
+            top: 24px;
+            height: calc(100vh - 48px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-popup {
+            padding: 12px;
+        }
+
+        .map-popup h4 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .map-popup p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .map-popup .rating {
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .map-section {
+                height: 400px;
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .search-input {
+                padding: 14px 14px 14px 44px;
+            }
+
+            .search-btn {
+                width: 100%;
+                padding: 14px;
+            }
+
+            .doctor-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .location {
+                justify-content: center;
+            }
+        }
+
+        .navbar {
+            background-color: white;
+            padding: 16px 24px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .login-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .login-btn:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        .availability {
+            display: none;
+            border-top: 1px solid var(--border-color);
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .doctor-card.expanded .availability {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dropdown Styles */
+        .specialty-dropdown,
+        .city-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .specialty-dropdown.visible,
+        .city-dropdown.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .specialty-item,
+        .city-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        .specialty-item i,
+        .city-item i {
+            color: #757575;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .specialty-item:hover,
+        .city-item:hover {
+            background-color: #f0f7ff;
+            color: var(--primary-color);
+        }
+
+        .specialty-item:hover i,
+        .city-item:hover i {
+            color: var(--primary-color);
+        }
+
+        .no-results {
+            padding: 16px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Scrollbar Styles */
+        .specialty-dropdown::-webkit-scrollbar,
+        .city-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .specialty-dropdown::-webkit-scrollbar-track,
+        .city-dropdown::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .specialty-dropdown::-webkit-scrollbar-thumb,
+        .city-dropdown::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .specialty-dropdown::-webkit-scrollbar-thumb:hover,
+        .city-dropdown::-webkit-scrollbar-thumb:hover {
+            background: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="./index.html" class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <h2>FindYourDoctor</h2>
+        </a>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='./index.html'" class="nav-btn home-btn">
+                <i class="fas fa-home"></i>
+                Home
+            </button>
+            <button id="auth-button" onclick="handleAuthClick()" class="nav-btn login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span id="auth-text">Sign In</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <main class="search-section">
+            <div class="search-box">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchInput" placeholder="Doktor veya uzmanlık ara" class="search-input">
+                </div>
+                <div class="search-input-wrapper">
+                    <input type="text" id="locationInput" placeholder="İl seçin" class="search-input">
+                </div>
+                <button type="button" id="searchButton" class="search-btn">
+                    <i class="fas fa-search"></i>
+                    Ara
+                </button>
+            </div>
+
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">Tüm Sonuçlar</button>
+                <button class="filter-tab" data-filter="available">Uygun Tarihler</button>
+                <button class="filter-tab" data-filter="online">Online Görüşme</button>
+            </div>
+
+            <div class="active-filters">
+                <!-- Active filters will be added here dynamically -->
+            </div>
+
+            <div id="doctorsList">
+                <!-- Doctor cards will be added here dynamically -->
+            </div>
+        </main>
+        <aside class="map-section">
+            <div id="map"></div>
+        </aside>
+    </div>
+
+    <script src="../Scripts/firebase-config.js"></script>
+    <script type="module" src="../Scripts/appointment.js"></script>
+    <script>
+        function handleAuthClick() {
+            const isAuthenticated = localStorage.getItem('token');
+            if (isAuthenticated) {
+                // Logout
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('userType');
+                window.location.href = 'index.html';
+            } else {
+                // Redirect to login page
+                window.location.href = 'user_register.html';
+            }
+        }
+
+        // Update auth button text based on authentication state
+        document.addEventListener('DOMContentLoaded', function() {
+            const authButton = document.getElementById('auth-button');
+            const authText = document.getElementById('auth-text');
+            const isAuthenticated = localStorage.getItem('token');
+
+            if (isAuthenticated) {
+                authButton.classList.remove('login-btn');
+                authButton.classList.add('logout-btn');
+                authText.textContent = 'Sign Out';
+            } else {
+                authButton.classList.remove('logout-btn');
+                authButton.classList.add('login-btn');
+                authText.textContent = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html> 

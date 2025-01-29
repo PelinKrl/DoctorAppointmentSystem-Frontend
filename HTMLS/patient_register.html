@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration - FindYourDoctor</title>
+    <link rel="stylesheet" href="../Styles/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- App Bar -->
+    <nav class="app-bar">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>FindYourDoctor</span>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='index.html'" class="nav-btn login-nav">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </button>
+        </div>
+    </nav>
+
+    <div class="registration-container">
+        <h2>Patient Registration</h2>
+        <p class="registration-subtitle">Sign in with Google to continue</p>
+
+        <div class="form-group">
+            <button id="googleSignInBtn" class="google-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxJNge8vHCKzxeRHHpR_KlMp7VSyZrFEo",
+            authDomain: "doctor-appointment-site-407509.firebaseapp.com",
+            projectId: "doctor-appointment-site-407509",
+            storageBucket: "doctor-appointment-site-407509.appspot.com",
+            messagingSenderId: "595972852770",
+            appId: "1:595972852770:web:c2e3dd115a082b0d4e7c60"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // Google Sign In Button Click Handler
+        document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const userData = {
+                    email: result.user.email,
+                    fullName: result.user.displayName,
+                    googleToken: await result.user.getIdToken()
+                };
+
+                // Register patient in backend
+                const response = await fetch('https://localhost:7285/api/Auth/patient-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', 'patient');
+                    window.location.href = 'appointment.html';
+                } else {
+                    const errorData = await response.text();
+                    console.error('Registration failed:', errorData);
+                    alert('Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                alert('Failed to sign in with Google. Please try again.');
+            }
+        });
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+</body>
+</html> 

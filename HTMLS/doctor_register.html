@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Registration - FindYourDoctor</title>
+    <link rel="stylesheet" href="../Styles/style.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <!-- Add SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .login-container {
+            max-width: 800px;  /* Increased from default */
+            width: 90%;
+            margin: 8rem auto;  /* Increased from 2rem to 8rem */
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .login-container h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .auth-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .google-auth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .google-auth-btn:hover {
+            background-color: #f5f5f5;
+            border-color: #aaa;
+        }
+
+        .registration-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .days-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .days-selection label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .time-range {
+            margin-top: 15px;
+        }
+
+        .time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        select, input[type="text"], input[type="time"], textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select {
+            appearance: auto;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+        }
+
+        select option {
+            padding: 8px;
+            background-color: white;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-select {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            -webkit-appearance: listbox;
+            -moz-appearance: listbox;
+            appearance: listbox;
+        }
+
+        .form-select:focus {
+            border-color: #4a90e2;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+
+        .form-select option {
+            padding: 8px;
+            background-color: #fff;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- App Bar -->
+    <nav class="app-bar">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>FindYourDoctor</span>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='index.html'" class="nav-btn login-nav">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </button>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <h2>Doctor Registration</h2>
+        <p class="login-subtitle">Sign in with Google to continue</p>
+
+        <div class="auth-buttons">
+            <button id="google-sign-in" class="google-auth-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+        </div>
+
+        <div id="doctor-details" class="registration-form" style="display: none;">
+            <form id="doctorRegistrationForm">
+                <div class="form-group">
+                    <label for="fullname">Fullname:</label>
+                    <input type="text" id="fullname" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="areaOfInterest">Area of Interest:</label>
+                    <select id="areaOfInterest" required>
+                        <option value="">Select Specialization</option>
+                        <option value="orthopedics">Orthopedics</option>
+                        <option value="pediatrics">Pediatrics</option>
+                        <option value="gynecology">Obstetrics And Gynecology</option>
+                        <option value="psychology">Psychology</option>
+                        <option value="ent">Ear Nose Throat</option>
+                        <option value="surgery">General Surgery</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <select id="city" required>
+                        <option value="">Select City</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="town">Town:</label>
+                    <select id="town" required>
+                        <option value="">Select Town</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Street Address:</label>
+                    <input type="text" id="address" required placeholder="Enter your street address">
+                </div>
+
+                <div class="form-group">
+                    <label>Available Days:</label>
+                    <div class="days-selection">
+                        <label><input type="checkbox" name="days" value="Monday"> Mon</label>
+                        <label><input type="checkbox" name="days" value="Tuesday"> Tue</label>
+                        <label><input type="checkbox" name="days" value="Wednesday"> Wed</label>
+                        <label><input type="checkbox" name="days" value="Thursday"> Thu</label>
+                        <label><input type="checkbox" name="days" value="Friday"> Fri</label>
+                        <label><input type="checkbox" name="days" value="Saturday"> Sat</label>
+                        <label><input type="checkbox" name="days" value="Sunday"> Sun</label>
+                    </div>
+                </div>
+
+                <div class="form-group time-range">
+                    <label>Available Hours:</label>
+                    <div class="time-inputs">
+                        <input type="time" id="startTime" value="09:00" required>
+                        <span>-</span>
+                        <input type="time" id="endTime" value="17:00" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="register-btn">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../Scripts/firebase-config.js"></script>
+    <script type="module" src="../js/doctor_register.js"></script>
+</body>
+</html> 
