@@ -12,39 +12,7 @@ async function loadConfig() {
             console.log('Config loaded:', config); // Debug log
         } catch (error) {
             console.error('Error loading config:', error);
-            // Fallback configuration
-            config = {
-                apiGateway: {
-                    baseUrl: 'https://localhost:9000',
-                    endpoints: {
-                        auth: {
-                            patientLogin: '/auth/patient-login',
-                            doctorLogin: '/auth/doctor-login',
-                            adminLogin: '/auth/admin-login'
-                        },
-                        doctors: {
-                            register: '/doctors/register',
-                            getAvailability: '/doctors/{doctorId}/availability',
-                            getDoctor: '/doctors/{id}',
-                            approve: '/doctors/approve/{doctorId}',
-                            getApproved: '/doctors/approved',
-                            getUnapproved: '/doctors/unapproved'
-                        },
-                        patients: {
-                            register: '/patients/register',
-                            searchDoctors: '/patients/search-doctors',
-                            makeAppointment: '/patients/make-appointment',
-                            getAppointment: '/patients/get-appointment/{doctorId}',
-                            getSpecialties: '/patients/specialties'
-                        },
-                        comments: {
-                            getReviews: '/comments/reviews/{doctorId}',
-                            addReview: '/comments/add-review',
-                            checkInappropriate: '/comments/check-inappropriate'
-                        }
-                    }
-                }
-            };
+            throw new Error('Failed to load configuration. Please check if config.json is accessible.');
         }
     }
     return config;

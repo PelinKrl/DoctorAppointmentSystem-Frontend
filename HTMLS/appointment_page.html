@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Your Doctor - Appointments</title>
-    <link rel="stylesheet" href="../Styles/style.css">
+    <link rel="stylesheet" href="/Styles/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -592,12 +592,12 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="./index.html" class="logo">
+        <a href="/index.html" class="logo">
             <i class="fas fa-heartbeat"></i>
             <h2>FindYourDoctor</h2>
         </a>
         <div class="nav-buttons">
-            <button onclick="window.location.href='./index.html'" class="nav-btn home-btn">
+            <button onclick="window.location.href='/index.html'" class="nav-btn home-btn">
                 <i class="fas fa-home"></i>
                 Home
             </button>
@@ -642,8 +642,8 @@
         </aside>
     </div>
 
-    <script src="../Scripts/firebase-config.js"></script>
-    <script type="module" src="../Scripts/appointment.js"></script>
+    <script src="/Scripts/firebase-config.js"></script>
+    <script type="module" src="/Scripts/appointment.js"></script>
     <script>
         function handleAuthClick() {
             const isAuthenticated = localStorage.getItem('token');
@@ -652,10 +652,10 @@
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 localStorage.removeItem('userType');
-                window.location.href = 'index.html';
+                window.location.href = '/index.html';
             } else {
                 // Redirect to login page
-                window.location.href = 'user_register.html';
+                window.location.href = '/user_register.html';
             }
         }
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Registration - FindYourDoctor</title>
-    <link rel="stylesheet" href="../Styles/style.css">
+    <link rel="stylesheet" href="/Styles/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
             <span>FindYourDoctor</span>
         </div>
         <div class="nav-buttons">
-            <button onclick="window.location.href='index.html'" class="nav-btn login-nav">
+            <button onclick="window.location.href='/index.html'" class="nav-btn login-nav">
                 <i class="fas fa-home"></i>
                 Back to Home
             </button>
@@ -73,7 +73,7 @@
                     const data = await response.json();
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('role', 'patient');
-                    window.location.href = 'appointment.html';
+                    window.location.href = '/appointment.html';
                 } else {
                     const errorData = await response.text();
                     console.error('Registration failed:', errorData);
