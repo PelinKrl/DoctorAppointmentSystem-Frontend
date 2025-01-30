@@ -1,4 +1,4 @@
-import apiClient from './api.js';
+import apiClient from '/api.js';
 
 // Store the authentication token
 let authToken = null;

@@ -1,4 +1,4 @@
-import apiClient from '../js/api.js';
+import apiClient from '/api.js';
 
 // DOM Elements
 const googleSignInBtn = document.getElementById('google-sign-in');

@@ -1,4 +1,4 @@
-import apiClient from './api.js';
+import apiClient from '/api.js';
 
 // Initialize Firebase when the script loads
 if (typeof window.firebaseConfig !== 'undefined') {

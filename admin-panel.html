@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - FindYourDoctor</title>
-    <link rel="stylesheet" href="/Styles/style.css">
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Add SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -191,7 +191,7 @@
                 };
                 console.log('Request headers:', headers);
                 
-                const response = await fetch('https://localhost:7285/api/doctors/unapproved', {
+                const response = await fetch('https://doctorappointmentgateway-c7h8etdyc8ayb7gs.canadacentral-01.azurewebsites.net/doctors/unapproved', {
                     method: 'GET',
                     headers: headers
                 });
@@ -276,7 +276,7 @@
 
             try {
                 console.log('Approving doctor:', doctorId);
-                const response = await fetch(`https://localhost:7285/api/doctors/approve/${doctorId}`, {
+                const response = await fetch(`https://doctorappointmentgateway-c7h8etdyc8ayb7gs.canadacentral-01.azurewebsites.net/doctors/approve/${doctorId}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
